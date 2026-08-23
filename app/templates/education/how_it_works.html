@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+
+{% block title %}How It Works - SecureShare{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center text-center mb-5">
+    <div class="col-md-8 mt-4">
+        <i class="bi bi-shield-lock display-1 text-info mb-3"></i>
+        <h1 class="text-dark display-5 fw-bold">How Our Security Works</h1>
+        <p class="lead text-muted">A deep dive into the hybrid cryptographic architecture protecting your files.</p>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <div class="col-12">
+        <div class="card bg-white border-light shadow-lg">
+            <div class="card-header border-light bg-transparent py-4 text-center">
+                <h4 class="text-dark mb-0">The Hybrid Encryption Flow</h4>
+            </div>
+            <div class="card-body p-5">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+                    <!-- Step 1 -->
+                    <div class="crypto-box flex-fill mx-2 my-2">
+                        <i class="bi bi-file-earmark-text fs-2 text-primary mb-2"></i>
+                        <h6 class="text-dark">1. Raw File</h6>
+                        <small class="text-muted">User selects file</small>
+                    </div>
+                    
+                    <div class="crypto-arrow d-none d-md-block"><i class="bi bi-arrow-right"></i></div>
+                    <div class="crypto-arrow d-md-none"><i class="bi bi-arrow-down"></i></div>
+                    
+                    <!-- Step 2 -->
+                    <div class="crypto-box flex-fill mx-2 my-2">
+                        <i class="bi bi-key fs-2 text-warning mb-2"></i>
+                        <h6 class="text-dark">2. AES-256-GCM</h6>
+                        <small class="text-muted">Generate random file key & encrypt payload</small>
+                    </div>
+
+                    <div class="crypto-arrow d-none d-md-block"><i class="bi bi-arrow-right"></i></div>
+                    <div class="crypto-arrow d-md-none"><i class="bi bi-arrow-down"></i></div>
+
+                    <!-- Step 3 -->
+                    <div class="crypto-box flex-fill mx-2 my-2 border-info">
+                        <i class="bi bi-lock fs-2 text-info mb-2"></i>
+                        <h6 class="text-dark">3. RSA-OAEP</h6>
+                        <small class="text-muted">Wrap AES key using Recipient's Public Key</small>
+                    </div>
+
+                    <div class="crypto-arrow d-none d-md-block"><i class="bi bi-arrow-right"></i></div>
+                    <div class="crypto-arrow d-md-none"><i class="bi bi-arrow-down"></i></div>
+
+                    <!-- Step 4 -->
+                    <div class="crypto-box flex-fill mx-2 my-2">
+                        <i class="bi bi-shield-check fs-2 text-success mb-2"></i>
+                        <h6 class="text-dark">4. RSA-PSS</h6>
+                        <small class="text-muted">Sender signs hashes for authenticity</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <div class="col-md-6">
+        <div class="card bg-white border-light h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="bi bi-lock-fill fs-3 text-primary me-3"></i>
+                    <h5 class="card-title text-dark mb-0">AES-256-GCM (Symmetric Encryption)</h5>
+                </div>
+                <p class="text-muted">We use AES (Advanced Encryption Standard) in GCM (Galois/Counter Mode) to encrypt the actual file contents. 
+                Why symmetric? Because it's fast and efficient for large data. GCM is an authenticated encryption mode, meaning it guarantees both confidentiality and integrity—it detects if the ciphertext is tampered with.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card bg-white border-light h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="bi bi-key-fill fs-3 text-warning me-3"></i>
+                    <h5 class="card-title text-dark mb-0">RSA-OAEP (Asymmetric Encryption)</h5>
+                </div>
+                <p class="text-muted">Asymmetric encryption is too slow for large files. Instead, we use a 2048-bit RSA key pair to protect the AES file key. The AES key is encrypted (wrapped) using the recipient's Public Key via OAEP padding scheme, ensuring only their Private Key can unwrap it.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card bg-white border-light h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="bi bi-hash fs-3 text-info me-3"></i>
+                    <h5 class="card-title text-dark mb-0">SHA-256 (Hashing)</h5>
+                </div>
+                <p class="text-muted">A cryptographic hash function acts like a digital fingerprint for your file. We calculate the SHA-256 hash of the file. If even a single bit of the file changes, the hash completely changes. This allows us to verify data integrity upon download.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card bg-white border-light h-100">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="bi bi-pen-fill fs-3 text-success me-3"></i>
+                    <h5 class="card-title text-dark mb-0">RSA-PSS (Digital Signatures)</h5>
+                </div>
+                <p class="text-muted">To prove who uploaded or shared the file (Non-Repudiation), the sender creates a digital signature by encrypting the file's hash with their Private Key. Any recipient can verify this signature using the sender's Public Key.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="card bg-white border-light">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="bi bi-shield-shaded fs-3 text-danger me-3"></i>
+                    <h5 class="card-title text-dark mb-0">Argon2id (Password Hashing)</h5>
+                </div>
+                <p class="text-muted">We do not store your passwords. We use Argon2id, the winner of the Password Hashing Competition, to securely hash your password with a unique salt. It is designed to resist both GPU cracking attacks and side-channel attacks.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card bg-white border-light mb-5">
+    <div class="card-header border-light bg-transparent py-3">
+        <h5 class="mb-0 text-dark">Key Differences Summary</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table  table-hover mb-0 text-center align-middle">
+                <thead>
+                    <tr class="text-muted">
+                        <th class="text-start ps-4">Concept</th>
+                        <th>Reversible?</th>
+                        <th>Keys Required</th>
+                        <th>Primary Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="text-start ps-4 fw-bold text-info">Symmetric Encryption</td>
+                        <td><i class="bi bi-check-circle-fill text-success"></i> Yes</td>
+                        <td>1 (Shared Secret)</td>
+                        <td>Confidentiality of Data</td>
+                    </tr>
+                    <tr>
+                        <td class="text-start ps-4 fw-bold text-warning">Asymmetric Encryption</td>
+                        <td><i class="bi bi-check-circle-fill text-success"></i> Yes</td>
+                        <td>2 (Public/Private Pair)</td>
+                        <td>Key Distribution</td>
+                    </tr>
+                    <tr>
+                        <td class="text-start ps-4 fw-bold text-dark">Hashing</td>
+                        <td><i class="bi bi-x-circle-fill text-danger"></i> No (One-way)</td>
+                        <td>0</td>
+                        <td>Integrity Verification</td>
+                    </tr>
+                    <tr>
+                        <td class="text-start ps-4 fw-bold text-success">Digital Signing</td>
+                        <td><i class="bi bi-x-circle-fill text-danger"></i> No (Verify only)</td>
+                        <td>2 (Sign with Private, Verify with Public)</td>
+                        <td>Authenticity / Non-repudiation</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

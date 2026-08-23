@@ -1,0 +1,171 @@
+/* ===== SecureShare - Glassmorphism UI Theme ===== */
+
+:root {
+    --primary: #0d6efd;
+    --primary-light: #e8f0fe;
+    --text-dark: #212529;
+    --text-muted: #55595c;
+    --glass-bg: rgba(255, 255, 255, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.5);
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+}
+
+/* Vibrant Animated Background */
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+body.bg-light, body {
+    background: linear-gradient(-45deg, #fbc2eb, #a6c1ee, #84fab0, #8fd3f4);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+    color: var(--text-dark);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Glassmorphism overrides for Bootstrap components */
+.navbar.bg-white, .card.bg-white, .bg-white, .auth-card {
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid var(--glass-border) !important;
+    box-shadow: var(--glass-shadow) !important;
+}
+
+.card {
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.card-header {
+    background-color: rgba(255, 255, 255, 0.3) !important;
+    border-bottom: 1px solid var(--glass-border) !important;
+}
+
+/* Animations for elements entering the screen */
+@keyframes fadeInSlideUp {
+    0% {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card, .stat-card, .flash-messages, .table-responsive {
+    animation: fadeInSlideUp 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* Add slight delay to stat cards to create a cascading effect */
+.col-md-3:nth-child(1) .stat-card { animation-delay: 0.1s; }
+.col-md-3:nth-child(2) .stat-card { animation-delay: 0.2s; }
+.col-md-3:nth-child(3) .stat-card { animation-delay: 0.3s; }
+.col-md-3:nth-child(4) .stat-card { animation-delay: 0.4s; }
+
+.stat-card {
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
+}
+.stat-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 15px 35px 0 rgba(31, 38, 135, 0.2) !important;
+}
+
+.border-top-primary { border-top: 4px solid #0d6efd !important; }
+.border-top-success { border-top: 4px solid #198754 !important; }
+.border-top-info    { border-top: 4px solid #0dcaf0 !important; }
+.border-top-warning { border-top: 4px solid #ffc107 !important; }
+
+/* Table Glassmorphism */
+.table, .table-hover tbody tr {
+    background-color: transparent !important;
+    color: var(--text-dark);
+}
+.table-light, .table-light-dark {
+    background-color: rgba(255, 255, 255, 0.4) !important;
+}
+.table-hover tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.5) !important;
+    backdrop-filter: blur(5px);
+}
+th, td {
+    border-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* List Groups */
+.list-group-item {
+    background-color: transparent !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    transition: background-color 0.2s ease;
+}
+.list-group-item:hover {
+    background-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Form Controls */
+.form-control, .form-select {
+    background-color: rgba(255, 255, 255, 0.5) !important;
+    border: 1px solid rgba(255, 255, 255, 0.6) !important;
+    backdrop-filter: blur(5px);
+    color: var(--text-dark) !important;
+    transition: all 0.3s ease;
+}
+.form-control:focus, .form-select:focus {
+    background-color: rgba(255, 255, 255, 0.8) !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+}
+
+/* Buttons */
+.btn {
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    backdrop-filter: blur(4px);
+}
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Badges */
+.badge.bg-light {
+    background-color: rgba(255, 255, 255, 0.6) !important;
+    backdrop-filter: blur(4px);
+}
+
+/* Flash messages */
+.flash-messages {
+    position: relative;
+    z-index: 1050;
+    margin-bottom: 1rem;
+}
+
+.cursor-pointer { cursor: pointer; }
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+/* Footer */
+footer.bg-white {
+    background: rgba(255, 255, 255, 0.3) !important;
+    backdrop-filter: blur(10px);
+    border-top: 1px solid var(--glass-border);
+}

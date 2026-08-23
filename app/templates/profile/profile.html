@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile - SecureShare{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h3 class="text-dark"><i class="bi bi-person-circle me-2 text-info"></i>My Profile</h3>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- User Info Card -->
+    <div class="col-md-5">
+        <div class="card bg-white border-light shadow-sm h-100">
+            <div class="card-header border-light bg-transparent py-3 text-center">
+                <div class="bg-primary bg-opacity-25 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                    <i class="bi bi-person text-primary fs-1"></i>
+                </div>
+                <h4 class="mb-0 text-dark">{{ current_user.name }}</h4>
+                <p class="text-muted">{{ current_user.email }}</p>
+                
+                <span class="badge {{ 'bg-success' if current_user.is_active else 'bg-danger' }}">
+                    {{ 'Active Account' if current_user.is_active else 'Disabled' }}
+                </span>
+                <span class="badge bg-info text-dark text-uppercase ms-1">{{ current_user.role }}</span>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush bg-transparent">
+                    <li class="list-group-item bg-transparent text-dark border-light px-0 d-flex justify-content-between">
+                        <span class="text-muted"><i class="bi bi-calendar3 me-2"></i>Member Since</span>
+                        <span>{{ current_user.created_at.strftime('%b %d, %Y') }}</span>
+                    </li>
+                    <li class="list-group-item bg-transparent text-dark border-light px-0 d-flex justify-content-between">
+                        <span class="text-muted"><i class="bi bi-clock-history me-2"></i>Last Login</span>
+                        <span>{{ current_user.last_login.strftime('%Y-%m-%d %H:%M') if current_user.last_login else 'N/A' }}</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-footer bg-transparent border-light text-center py-3">
+                <a href="{{ url_for('profile.security') }}" class="btn btn-outline-info w-100">
+                    <i class="bi bi-shield-lock me-1"></i> Security Settings
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cryptographic Identity Card -->
+    <div class="col-md-7">
+        <div class="card bg-white border-light shadow-sm h-100">
+            <div class="card-header border-light bg-transparent d-flex justify-content-between align-items-center py-3">
+                <h5 class="mb-0 text-dark"><i class="bi bi-key-fill me-2 text-warning"></i>Cryptographic Identity</h5>
+                {% if current_user.public_key %}
+                <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-50"><i class="bi bi-check-circle me-1"></i>Keys Generated</span>
+                {% else %}
+                <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-50"><i class="bi bi-x-circle me-1"></i>Keys Missing</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="alert alert-dark bg-secondary bg-opacity-10 border-light text-muted small mb-4">
+                    <i class="bi bi-info-circle me-2 text-info"></i>Your RSA-2048 Public Key is used by others to encrypt files shared with you. 
+                    Your Private Key is securely encrypted on our servers using a key derived from your password (Argon2id) and is decrypted only in memory during your active session.
+                </div>
+
+                <h6 class="text-dark mb-2">RSA Public Key</h6>
+                <div class="position-relative">
+                    <textarea class="form-control bg-black text-info border-light font-monospace small" id="publicKeyBlock" rows="8" readonly>{% if current_user.public_key %}{{ current_user.public_key }}{% else %}No public key found. Please re-register or contact admin.{% endif %}</textarea>
+                    
+                    {% if current_user.public_key %}
+                    <button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2 copy-btn" data-clipboard-target="#publicKeyBlock" title="Copy to clipboard">
+                        <i class="bi bi-clipboard"></i> Copy
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

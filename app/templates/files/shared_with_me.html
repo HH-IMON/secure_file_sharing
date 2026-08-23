@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Shared With Me - SecureShare{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="text-dark"><i class="bi bi-share-fill me-2 text-info"></i>Shared With Me</h3>
+</div>
+
+<div class="row g-4">
+    {% for item in shared_items %}
+    {% set file = item.file %}
+    {% set share = item.share %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card bg-white border-light shadow-sm h-100 position-relative">
+            {% if share.is_revoked %}
+                <div class="position-absolute top-0 end-0 p-2"><span class="badge bg-danger">Revoked</span></div>
+            {% elif share.is_expired %}
+                <div class="position-absolute top-0 end-0 p-2"><span class="badge bg-warning text-dark">Expired</span></div>
+            {% else %}
+                <div class="position-absolute top-0 end-0 p-2"><span class="badge bg-success">Active</span></div>
+            {% endif %}
+
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-primary bg-opacity-10 p-3 rounded me-3 text-info">
+                        <i class="bi bi-file-earmark-lock fs-3"></i>
+                    </div>
+                    <div>
+                        <h5 class="card-title text-dark mb-1 text-truncate" style="max-width: 200px;" title="{{ file.original_filename }}">
+                            {{ file.original_filename }}
+                        </h5>
+                        <p class="card-text text-muted small mb-0">{{ (file.file_size / 1024)|round(1) }} KB</p>
+                    </div>
+                </div>
+
+                <div class="mb-3 small">
+                    <div class="text-muted">From: <span class="text-dark">{{ item.sender_name }}</span></div>
+                    <div class="text-muted">Shared: <span class="text-dark">{{ share.created_at.strftime('%b %d, %Y') }}</span></div>
+                    {% if share.expires_at %}
+                    <div class="text-muted">Expires: <span class="text-warning">{{ share.expires_at.strftime('%b %d, %Y %H:%M') }}</span></div>
+                    {% endif %}
+                    <div class="text-muted mt-1">Permission: <span class="badge bg-secondary text-uppercase">{{ share.permission }}</span></div>
+                </div>
+
+                {% if share.message %}
+                <div class="alert alert-dark bg-secondary bg-opacity-25 border-light text-dark small py-2 mb-3">
+                    <i class="bi bi-chat-quote-fill me-2 text-info"></i>"{{ share.message }}"
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="card-footer bg-transparent border-light text-end">
+                <a href="{{ url_for('files.file_detail', uuid=file.uuid) }}" class="btn btn-sm btn-outline-secondary">Details</a>
+                
+                {% if share.is_active %}
+                    {% if share.permission in ['download', 'full'] %}
+                        <a href="{{ url_for('files.download', uuid=file.uuid) }}" class="btn btn-sm btn-info fw-bold">
+                            <i class="bi bi-download me-1"></i> Decrypt
+                        </a>
+                    {% endif %}
+                {% else %}
+                    <button class="btn btn-sm btn-secondary disabled">Access Denied</button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+        <div class="card bg-white border-light shadow-sm">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-people display-4 text-muted mb-3 d-block opacity-50"></i>
+                <h5 class="text-dark">No Shared Files</h5>
+                <p class="text-muted">No one has shared files with you yet.</p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

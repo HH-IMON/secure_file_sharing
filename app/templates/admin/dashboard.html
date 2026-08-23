@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - SecureShare{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="text-warning"><i class="bi bi-shield-shaded me-2"></i>Admin Dashboard</h3>
+</div>
+
+<!-- Key Metrics -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card stat-card bg-white border-light border-top-primary shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="text-muted mb-2">Total Users</h6>
+                <h2 class="mb-0 text-dark">{{ total_users|default(0) }}</h2>
+                <a href="{{ url_for('admin.users') }}" class="stretched-link text-decoration-none"></a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card stat-card bg-white border-light border-top-info shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="text-muted mb-2">Encrypted Files</h6>
+                <h2 class="mb-0 text-dark">{{ total_files|default(0) }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card stat-card bg-white border-light border-top-success shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="text-muted mb-2">Active Shares</h6>
+                <h2 class="mb-0 text-dark">{{ total_shares|default(0) }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card stat-card bg-white border-light border-top-warning shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="text-muted mb-2">Security Alerts</h6>
+                <h2 class="mb-0 text-warning">{{ security_events|default(0) }}</h2>
+                <a href="{{ url_for('admin.audit_logs') }}" class="stretched-link text-decoration-none"></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Security Configuration Status -->
+    <div class="col-md-4">
+        <div class="card bg-white border-light shadow-sm h-100">
+            <div class="card-header border-light bg-transparent py-3">
+                <h5 class="mb-0 text-dark"><i class="bi bi-patch-check-fill me-2 text-success"></i>System Security Score</h5>
+            </div>
+            <div class="card-body text-center pb-0">
+                <div class="display-3 text-success fw-bold mb-2">98<span class="fs-4 text-muted">/100</span></div>
+                <p class="text-success small fw-bold">Enterprise Grade Enabled</p>
+            </div>
+            <ul class="list-group list-group-flush bg-transparent px-3 pb-3">
+                <li class="list-group-item bg-transparent text-dark border-light px-0 d-flex justify-content-between">
+                    <span><i class="bi bi-check-circle-fill text-success me-2"></i> Argon2id Authentication</span>
+                </li>
+                <li class="list-group-item bg-transparent text-dark border-light px-0 d-flex justify-content-between">
+                    <span><i class="bi bi-check-circle-fill text-success me-2"></i> Role-Based Access Control</span>
+                </li>
+                <li class="list-group-item bg-transparent text-dark border-light px-0 d-flex justify-content-between">
+                    <span><i class="bi bi-check-circle-fill text-success me-2"></i> AES-256-GCM Encryption</span>
+                </li>
+                <li class="list-group-item bg-transparent text-dark border-light px-0 d-flex justify-content-between">
+                    <span><i class="bi bi-check-circle-fill text-success me-2"></i> RSA-OAEP Key Wrapping</span>
+                </li>
+                <li class="list-group-item bg-transparent text-dark border-light px-0 d-flex justify-content-between">
+                    <span><i class="bi bi-check-circle-fill text-success me-2"></i> RSA-PSS Signatures</span>
+                </li>
+                <li class="list-group-item bg-transparent text-dark border-light px-0 d-flex justify-content-between">
+                    <span><i class="bi bi-check-circle-fill text-success me-2"></i> Comprehensive Audit Logging</span>
+                </li>
+                <li class="list-group-item bg-transparent text-dark px-0 d-flex justify-content-between">
+                    <span><i class="bi bi-check-circle-fill text-success me-2"></i> Strict Security Headers</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Recent Audit Logs (Snippet) -->
+    <div class="col-md-8">
+        <div class="card bg-white border-light shadow-sm h-100">
+            <div class="card-header border-light bg-transparent py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 text-dark"><i class="bi bi-list-columns-reverse me-2 text-info"></i>Recent System Activity</h5>
+                <a href="{{ url_for('admin.audit_logs') }}" class="btn btn-sm btn-outline-info">View All Logs</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table  table-hover mb-0">
+                        <thead class="text-muted">
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>User</th>
+                                <th>Action</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in recent_logs %}
+                            <tr>
+                                <td class="text-muted small">{{ log.created_at.strftime('%m-%d %H:%M:%S') }}</td>
+                                <td>{{ log.user.email if log.user else 'System' }}</td>
+                                <td><span class="badge bg-light text-dark border">{{ log.action }}</span></td>
+                                <td>
+                                    {% if log.status == 'success' %}
+                                        <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-50">Success</span>
+                                    {% else %}
+                                        <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-50">Failure</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">No recent logs found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

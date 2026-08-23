@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Audit Logs - SecureShare{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="text-warning"><i class="bi bi-journal-text me-2"></i>Security Audit Logs</h3>
+    <div>
+        <a href="{{ url_for('admin.index') }}" class="btn btn-outline-secondary me-2"><i class="bi bi-arrow-left me-1"></i>Dashboard</a>
+        <button class="btn btn-outline-info" onclick="alert('Export functionality would generate a signed CSV here.')"><i class="bi bi-download me-1"></i>Export Logs</button>
+    </div>
+</div>
+
+<div class="card bg-white border-light shadow-sm mb-4">
+    <div class="card-body py-3">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text bg-light text-dark border border-light text-dark"><i class="bi bi-search"></i></span>
+                    <input type="text" id="logSearch" class="form-control bg-white text-dark border-light" placeholder="Search logs...">
+                </div>
+            </div>
+            <div class="col-md-8 text-end">
+                <p class="text-muted small mb-0 mt-2"><i class="bi bi-info-circle me-1"></i>All critical security events are immutably logged for forensic analysis.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card bg-white border-light shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table  table-hover mb-0 align-middle" id="auditLogTable">
+                <thead class="table-light border-bottom border-light text-muted">
+                    <tr>
+                        <th class="ps-3">Timestamp (UTC)</th>
+                        <th>User Email</th>
+                        <th>Action</th>
+                        <th>Resource</th>
+                        <th>Status</th>
+                        <th>IP Address</th>
+                        <th class="pe-3">Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs.items %}
+                    <tr>
+                        <td class="ps-3 text-muted small">{{ log.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td class="text-info small">{{ log.user.email if log.user else 'SYSTEM' }}</td>
+                        <td><span class="badge bg-light text-dark border">{{ log.action }}</span></td>
+                        <td class="text-muted small font-monospace">{{ log.resource_id or '-' }}</td>
+                        <td>
+                            {% if log.status == 'success' %}
+                                <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-50">Success</span>
+                            {% else %}
+                                <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-50">Failure</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-muted small font-monospace">{{ log.ip_address }}</td>
+                        <td class="pe-3 text-muted small text-truncate" style="max-width: 200px;" title="{{ log.details or '' }}">
+                            {{ log.details or '-' }}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-5">No audit logs available.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Pagination -->
+    {% if logs.pages > 1 %}
+    <div class="card-footer bg-transparent border-light py-3 d-flex justify-content-center">
+        <nav aria-label="Log navigation">
+            <ul class="pagination pagination-sm mb-0">
+                <li class="page-item {{ 'disabled' if not logs.has_prev }}">
+                    <a class="page-link bg-white border-light text-info" href="{{ url_for('admin.audit_logs', page=logs.prev_num) if logs.has_prev else '#' }}">Previous</a>
+                </li>
+                
+                {% for page_num in logs.iter_pages(left_edge=1, left_current=2, right_current=2, right_edge=1) %}
+                    {% if page_num %}
+                        <li class="page-item {{ 'active' if page_num == logs.page }}">
+                            <a class="page-link {{ 'bg-info border-info text-dark fw-bold' if page_num == logs.page else 'bg-white border-light text-dark' }}" href="{{ url_for('admin.audit_logs', page=page_num) }}">{{ page_num }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link bg-white border-light text-muted">...</span></li>
+                    {% endif %}
+                {% endfor %}
+                
+                <li class="page-item {{ 'disabled' if not logs.has_next }}">
+                    <a class="page-link bg-white border-light text-info" href="{{ url_for('admin.audit_logs', page=logs.next_num) if logs.has_next else '#' }}">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - SecureShare{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="text-dark">Welcome, <span class="text-info">{{ current_user.name }}</span></h2>
+    <div>
+        <a href="{{ url_for('files.upload') }}" class="btn btn-info text-dark fw-bold"><i class="bi bi-cloud-arrow-up me-2"></i>Upload File</a>
+    </div>
+</div>
+
+<!-- Stat Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card stat-card bg-white border-light border-top-primary shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-2">My Files</h6>
+                        <h3 class="mb-0 text-dark">{{ total_files|default(0) }}</h3>
+                    </div>
+                    <div class="stat-icon bg-primary bg-opacity-25 text-primary rounded-circle p-3">
+                        <i class="bi bi-file-earmark-lock fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card stat-card bg-white border-light border-top-success shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-2">Shared Files</h6>
+                        <h3 class="mb-0 text-dark">{{ shared_files|default(0) }}</h3>
+                    </div>
+                    <div class="stat-icon bg-success bg-opacity-25 text-success rounded-circle p-3">
+                        <i class="bi bi-share fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card stat-card bg-white border-light border-top-info shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-2">Received Files</h6>
+                        <h3 class="mb-0 text-dark">{{ received_files|default(0) }}</h3>
+                    </div>
+                    <div class="stat-icon bg-info bg-opacity-25 text-info rounded-circle p-3">
+                        <i class="bi bi-inbox fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card stat-card bg-white border-light border-top-warning shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-2">Security Events</h6>
+                        <h3 class="mb-0 text-dark">{{ security_events|default(0) }}</h3>
+                    </div>
+                    <div class="stat-icon bg-warning bg-opacity-25 text-warning rounded-circle p-3">
+                        <i class="bi bi-shield-exclamation fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Storage & Quick Actions -->
+    <div class="col-md-4">
+        <div class="card bg-white border-light shadow-sm mb-4">
+            <div class="card-header border-light bg-transparent">
+                <h5 class="mb-0 text-dark"><i class="bi bi-hdd-network me-2 text-info"></i>Storage Usage</h5>
+            </div>
+            <div class="card-body">
+                <h2 class="text-center text-dark mb-3">{{ formatted_storage|default('0 B') }}</h2>
+                <div class="progress bg-secondary mb-2" style="height: 10px;">
+                    <div class="progress-bar bg-info" role="progressbar" style="width: {{ storage_percent|default(0) }}%"></div>
+                </div>
+                <p class="text-center text-muted small">Total encrypted data stored</p>
+            </div>
+        </div>
+
+        <div class="card bg-white border-light shadow-sm">
+            <div class="card-header border-light bg-transparent">
+                <h5 class="mb-0 text-dark"><i class="bi bi-lightning me-2 text-warning"></i>Quick Actions</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush rounded-bottom">
+                    <a href="{{ url_for('files.upload') }}" class="list-group-item list-group-item-action bg-white border-light text-dark">
+                        <i class="bi bi-upload me-2 text-primary"></i> Upload Secure File
+                    </a>
+                    <a href="{{ url_for('files.my_files') }}" class="list-group-item list-group-item-action bg-white border-light text-dark">
+                        <i class="bi bi-folder2-open me-2 text-success"></i> Browse My Files
+                    </a>
+                    <a href="{{ url_for('sharing.shared_with_me') }}" class="list-group-item list-group-item-action bg-white border-light text-dark">
+                        <i class="bi bi-people me-2 text-info"></i> View Shared With Me
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="col-md-8">
+        <div class="card bg-white border-light shadow-sm h-100">
+            <div class="card-header border-light bg-transparent d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 text-dark"><i class="bi bi-activity me-2 text-success"></i>Recent Security Activity</h5>
+                <a href="{{ url_for('profile.security') }}" class="btn btn-sm btn-outline-secondary">View All</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table  table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Action</th>
+                                <th>Resource</th>
+                                <th>Status</th>
+                                <th>Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in recent_logs %}
+                            <tr>
+                                <td>
+                                      <span class="badge bg-light text-dark border">{{ log.action }}</span>
+                                </td>
+                                <td class="text-muted">{{ log.resource_id or 'System' }}</td>
+                                <td>
+                                    {% if log.status == 'success' %}
+                                    <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Success</span>
+                                    {% else %}
+                                    <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Failure</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-muted small">{{ log.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">No recent activity found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

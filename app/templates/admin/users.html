@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}User Management - SecureShare{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="text-warning"><i class="bi bi-people-fill me-2"></i>User Management <span class="badge bg-light text-dark border fs-6 ms-2">{{ users|length }} Total</span></h3>
+    <a href="{{ url_for('admin.index') }}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left me-1"></i>Back to Dashboard</a>
+</div>
+
+<div class="card bg-white border-light shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table  table-hover mb-0 align-middle">
+                <thead class="table-light border-bottom border-light">
+                    <tr>
+                        <th class="ps-4">Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Last Login</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                    <tr>
+                        <td class="ps-4 fw-bold text-dark">{{ u.name }}</td>
+                        <td class="text-info">{{ u.email }}</td>
+                        <td>
+                            <span class="badge {{ 'bg-warning text-dark' if u.role == 'admin' else 'bg-light text-dark border' }} text-uppercase">{{ u.role }}</span>
+                        </td>
+                        <td>
+                            {% if u.is_active %}
+                                <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-50">Active</span>
+                            {% else %}
+                                <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-50">Disabled</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-muted small">{{ u.created_at.strftime('%Y-%m-%d') }}</td>
+                        <td class="text-muted small">{{ u.last_login_at.strftime('%Y-%m-%d %H:%M') if u.last_login_at else 'Never' }}</td>
+                        <td class="text-end pe-4">
+                            {% if u.id != current_user.id %}
+                            <form action="{{ url_for('admin.toggle_user', uuid=u.uuid) }}" method="POST" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                {% if u.is_active %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to disable this user? They will not be able to login or decrypt files.');">Disable</button>
+                                {% else %}
+                                <button type="submit" class="btn btn-sm btn-outline-success">Enable</button>
+                                {% endif %}
+                            </form>
+                            {% else %}
+                            <button class="btn btn-sm btn-outline-secondary disabled">Current User</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

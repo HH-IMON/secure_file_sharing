@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload File - SecureShare{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card bg-white border-light shadow-lg">
+            <div class="card-header border-light bg-transparent py-3">
+                <h4 class="mb-0 text-dark"><i class="bi bi-cloud-arrow-up me-2 text-info"></i>Secure File Upload</h4>
+            </div>
+            <div class="card-body p-4">
+                
+                <div class="alert bg-primary bg-opacity-10 border-primary text-dark mb-4">
+                    <div class="d-flex">
+                        <i class="bi bi-shield-lock-fill fs-3 text-info me-3"></i>
+                        <div>
+                            <h6 class="mb-1 text-info">End-to-End Encryption</h6>
+                            <p class="mb-0 small text-muted">Your file will be automatically encrypted using <strong>AES-256-GCM</strong> before storage. A unique encryption key is generated for each file, and then wrapped using your <strong>RSA Public Key</strong>.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <form method="POST" action="{{ url_for('files.upload') }}" enctype="multipart/form-data" id="uploadForm">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="upload-area border border-light border-dashed rounded p-5 text-center mb-4 position-relative hover-overlay cursor-pointer" id="dropZone" onclick="document.getElementById('fileInput').click()">
+                        <i class="bi bi-cloud-arrow-up display-1 text-muted mb-3" id="uploadIcon"></i>
+                        <h5 class="text-dark" id="uploadText">Drag & Drop or Click to Select</h5>
+                        <p class="text-muted small mb-0">Max file size: 100MB</p>
+                        <p class="text-muted small mt-1">Allowed: pdf, txt, doc, docx, png, jpg, jpeg, zip</p>
+                        
+                        <div class="d-none">
+                            {{ form.file(class="form-control", id="fileInput") }}
+                        </div>
+                    </div>
+                    {% if form.file.errors %}
+                        <div class="text-danger small mb-3">
+                            {% for error in form.file.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-info fw-bold py-2" id="submitBtn">
+                            <i class="bi bi-lock-fill me-2"></i> Encrypt & Upload
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const fileInput = document.getElementById('fileInput');
+    const dropZone = document.getElementById('dropZone');
+    const uploadText = document.getElementById('uploadText');
+    const uploadIcon = document.getElementById('uploadIcon');
+    const submitBtn = document.getElementById('submitBtn');
+    const form = document.getElementById('uploadForm');
+
+    fileInput.addEventListener('change', function(e) {
+        if(this.files && this.files[0]) {
+            const fileName = this.files[0].name;
+            const fileSize = (this.files[0].size / 1024 / 1024).toFixed(2);
+            uploadIcon.className = "bi bi-file-earmark-check display-1 text-success mb-3";
+            uploadText.innerHTML = `<span class="text-success">${fileName}</span> <br><small class="text-muted">${fileSize} MB</small>`;
+        }
+    });
+
+    form.addEventListener('submit', function() {
+        if(fileInput.files.length > 0) {
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Encrypting...';
+            submitBtn.classList.add('disabled');
+        }
+    });
+
+    // Simple Drag and Drop styling
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false)
+    });
+    function preventDefaults (e) { e.preventDefault(); e.stopPropagation(); }
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => dropZone.classList.add('border-info', 'bg-white'), false)
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => dropZone.classList.remove('border-info', 'bg-white'), false)
+    });
+
+    dropZone.addEventListener('drop', function(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        fileInput.files = files;
+        
+        if(files && files[0]) {
+            const fileName = files[0].name;
+            uploadIcon.className = "bi bi-file-earmark-check display-1 text-success mb-3";
+            uploadText.innerHTML = `<span class="text-success">${fileName}</span>`;
+        }
+    }, false);
+</script>
+{% endblock %}
